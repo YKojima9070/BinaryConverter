@@ -130,7 +130,7 @@ class App():
     def img_dir_get(self):
         img_format = [".png", ".jpg", ".jpeg", ".bmp", ".JPG"]
         tar_dir = os.path.dirname(tkdialog.askopenfilename(filetypes=[('all_files', '*.*')], initialdir=os.getcwd()))
-        self.img_list = [p for p in glob.glob("{0}/**".format(tar_dir), recursive=True) if os.path.splitext(p)[1] in img_format]
+        self.img_list = [p for p in glob.glob("{0}/*".format(tar_dir), recursive=False) if os.path.splitext(p)[1] in img_format]
 
 
     def img_show(self):
