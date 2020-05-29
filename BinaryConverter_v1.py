@@ -19,41 +19,53 @@ class App():
         self.root.title(root_title)
         self.root.configure(bg='#25254f')
 
-        label_button1 = tkinter.Button(self.root, text="バイナリデータ作成", command=self.data_export)
+        label_button1 = tkinter.Button(self.root, text="バイナリデータ作成", font='Helvetica 14', command=self.data_export, bg='White')
         label_button1.place(x=1450, y=10, width=210, height=50)
 
-        frame = tkinter.LabelFrame(root, width=210, height=280, text="SelectLabel")
+        frame = tkinter.Frame(root, width=210, height=280, bg='gray97',  borderwidth=5, relief='groove')
         frame.place(x=1450, y=70)
 
         self.v1 = tkinter.IntVar()
         self.v1.set(0)
 
-        radio_bt0 = tkinter.Radiobutton(self.root, text='_class0', value=0, variable=self.v1)
+        radio_bt0 = tkinter.Radiobutton(self.root, text='_class0', value=0, variable=self.v1, bg='gray97')
         radio_bt0.place(x=1470, y=100)
-        self.box0 = tkinter.Label(self.root, width=5, bg='#FFFFFF')
+        self.box0 = tkinter.Label(self.root, width=4, bg='#FFFFFF', borderwidth=2, relief='raised')
         self.box0.place(x=1570, y=100)
 
-        radio_bt1 = tkinter.Radiobutton(self.root, text='_class1', value=1, variable=self.v1)
+        border1 = tkinter.Frame(root, width=185, height=5, borderwidth=30, relief='groove')
+        border1.place(x=1460, y=130)
+
+        radio_bt1 = tkinter.Radiobutton(self.root, text='_class1', value=1, variable=self.v1, bg='gray97')
         radio_bt1.place(x=1470, y=150)
-        self.box1 = tkinter.Label(self.root, width=5, bg='#FFFFFF')
+        self.box1 = tkinter.Label(self.root, width=4, bg='#FFFFFF', borderwidth=2, relief='raised')
         self.box1.place(x=1570, y=150)
 
-        radio_bt2 = tkinter.Radiobutton(self.root, text='_class2', value=2, variable=self.v1)
+        border2 = tkinter.Frame(root, width=185, height=5, borderwidth=30, relief='groove')
+        border2.place(x=1460, y=180)
+
+        radio_bt2 = tkinter.Radiobutton(self.root, text='_class2', value=2, variable=self.v1, bg='gray97')
         radio_bt2.place(x=1470, y=200)
-        self.box2 = tkinter.Label(self.root, width=5, bg='#FFFFFF')
+        self.box2 = tkinter.Label(self.root, width=4, bg='#FFFFFF', borderwidth=2, relief='raised')
         self.box2.place(x=1570, y=200)
 
-        radio_bt3 = tkinter.Radiobutton(self.root, text='_class3', value=3, variable=self.v1)
+        border3 = tkinter.Frame(root, width=185, height=5, borderwidth=30, relief='groove')
+        border3.place(x=1460, y=230)
+
+        radio_bt3 = tkinter.Radiobutton(self.root, text='_class3', value=3, variable=self.v1, bg='gray97')
         radio_bt3.place(x=1470, y=250)
-        self.box3 = tkinter.Label(self.root, width=5, bg='#FFFFFF')
+        self.box3 = tkinter.Label(self.root, width=4, bg='#FFFFFF', borderwidth=2, relief='raised')
         self.box3.place(x=1570, y=250)
 
-        radio_bt4 = tkinter.Radiobutton(self.root, text='_class4', value=4, variable=self.v1)
+        border4 = tkinter.Frame(root, width=185, height=5, borderwidth=30, relief='groove')
+        border4.place(x=1460, y=280)
+
+        radio_bt4 = tkinter.Radiobutton(self.root, text='_class4', value=4, variable=self.v1, bg='gray97')
         radio_bt4.place(x=1470, y=300)
-        self.box4 = tkinter.Label(self.root, width=5, bg='#FFFFFF')
+        self.box4 = tkinter.Label(self.root, width=4, bg='#FFFFFF', borderwidth=2, relief='raised')
         self.box4.place(x=1570, y=300)
 
-        exit_button = tkinter.Button(self.root, text='Exit', command=self.exit_app)
+        exit_button = tkinter.Button(self.root, text='Exit', font='Helvetica 20', command=self.exit_app, bg='White')
         exit_button.place(x=1450, y=800, width=210, height=50)
 
         self.img_canvas = tkinter.Canvas(self.root, width=1400, height=1000)
@@ -213,4 +225,3 @@ class App():
 
 
 app_class = App(tkinter.Tk(), 'BinaryConverter v1.0')
-
