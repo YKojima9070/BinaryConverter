@@ -14,12 +14,6 @@ class App():
         self.cur_img_num = 0
         self.color_dict = {}
 
-        try:
-            self.img_dir_get()
-
-        except:
-            print('FileOpenError')
-
         self.root = root
         self.root.geometry('1680x1050')
         self.root.title(root_title)
@@ -55,15 +49,8 @@ class App():
         self.box4 = tkinter.Label(self.root, width=5, bg='#FFFFFF')
         self.box4.place(x=1550, y=300)
 
-        iname = tkinter.StringVar(value=self.img_list)
-
-        self.listbox = tkinter.Listbox(self.root, listvariable=iname)
-        self.listbox.place(width=210, height=350, x=1450, y=380)
-        self.root.bind('<<ListboxSelect>>', self.listbox_callback)
-
         exit_button = tkinter.Button(self.root, text='Exit', command=self.exit_app)
         exit_button.place(x=1450, y=800, width=210, height=50)
-
 
         self.img_canvas = tkinter.Canvas(self.root, width=1400, height=1000)
         self.label_canvas = tkinter.Canvas(self.root, width=1400, height=1000)
@@ -71,6 +58,18 @@ class App():
         self.img_canvas.bind('<Motion>', self.callback)
         self.img_canvas.bind('<Button>', self.callback)
         self.img_canvas.focus_set()
+
+        try:
+            self.img_dir_get()
+
+        except:
+            print('FileOpenError')
+
+        iname = tkinter.StringVar(value=self.img_list)
+
+        self.listbox = tkinter.Listbox(self.root, listvariable=iname)
+        self.listbox.place(width=210, height=350, x=1450, y=380)
+        self.root.bind('<<ListboxSelect>>', self.listbox_callback)
 
         self.root.bind_all()
 
@@ -80,7 +79,7 @@ class App():
 
     def callback(self, event):
         if event.x is not None and event.num == 1:
-            pixel_value = self.array_img[event.y, event.x]
+            pixel_value = self.org_img[event.y, event.x]
             hex_value = '#{:02x}{:02x}{:02x}'.format(pixel_value[0], pixel_value[1], pixel_value[2])
             
             _n = self.v1.get()
@@ -88,7 +87,6 @@ class App():
             if _n == 0:
                 self.box0.configure(bg=hex_value)
                 self.color_dict['_class0'] = self.hextobgr(hex_value)
-            
             elif _n == 1:
                 self.box1.configure(bg=hex_value)
                 self.color_dict['_class1'] = self.hextobgr(hex_value)
@@ -117,12 +115,13 @@ class App():
         if len(self.listbox.curselection()) == 0:
             return
         else:
-            self.cur_img_num= self.listbox.curselection()[0]
+            self.cur_img_num = self.listbox.curselection()[0]
             self.img_show()
 
 
     def hextobgr(self, value):
         value = value.lstrip('#')
+        value = '{0}{1}{2}'.format(value[4:6], value[2:4], value[0:2])
         lv = len(value)
         return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv //3))
 
@@ -135,9 +134,9 @@ class App():
 
     def img_show(self):
         img = cv2.imread(self.img_list[self.cur_img_num])
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
-        self.array_img = self.scale_box(img)
-        self.dst_img = Image.fromarray(self.array_img, 'RGBA')
+        self.org_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
+        img = self.scale_box(self.org_img)
+        self.dst_img = Image.fromarray(img, 'RGBA')
         self.dst_img = ImageTk.PhotoImage(self.dst_img)
         self.img_canvas.create_image(0, 0, image=self.dst_img, anchor='nw')
         self.img_canvas.place(x=0, y=0)
@@ -168,14 +167,18 @@ class App():
 
     def binary_change(self, img_list, class_name, color_thresh, tar_dir):
         img = np.fromfile(img_list, dtype=np.uint8)
-        img = cv2.imdecode(img, cv2.IMREAD_UNCHANGED)
+        img = cv2.imdecode(img, cv2.IMREAD_COLOR)
 
         b = img[:, :, 0]
         g = img[:, :, 1]
         r = img[:, :, 2]
 
         mask = np.zeros(img.shape, dtype=np.uint8)
-        mask[(b > color_thresh[0]-30) & (g > color_thresh[1]-30) & (r > color_thresh[2]-30)] = 255
+
+        mask[((b < color_thresh[0]+5) & (b > color_thresh[0]-5)) & \
+            ((g < color_thresh[1]+5) & (g > color_thresh[1]-5)) & \
+                ((r < color_thresh[2]+5) & (r > color_thresh[2]-5))] = 255
+
         mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
         _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
 
