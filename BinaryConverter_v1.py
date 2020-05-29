@@ -74,24 +74,27 @@ class App():
         self.img_canvas.bind('<Motion>', self.callback)
         self.img_canvas.bind('<Button>', self.callback)
         self.img_canvas.focus_set()
+    
+        self.img_dir_get()
 
-        try:
-            self.img_dir_get()
+        if self.img_list:
 
-        except:
-            print('FileOpenError')
+            iname = tkinter.StringVar(value=self.img_list)
 
-        iname = tkinter.StringVar(value=self.img_list)
+            self.listbox = tkinter.Listbox(self.root, listvariable=iname)
+            self.listbox.place(width=210, height=350, x=1450, y=380)
+            self.root.bind('<<ListboxSelect>>', self.listbox_callback)
 
-        self.listbox = tkinter.Listbox(self.root, listvariable=iname)
-        self.listbox.place(width=210, height=350, x=1450, y=380)
-        self.root.bind('<<ListboxSelect>>', self.listbox_callback)
+            self.root.bind_all()
 
-        self.root.bind_all()
+            self.img_show()
 
-        self.img_show()
+            self.root.mainloop()
 
-        self.root.mainloop()
+        else:
+            messagebox.showerror('画像読み込みエラー', '起動時に画像選択して下さい。')
+            self.exit_app()
+
 
     def callback(self, event):
         if event.x is not None and event.num == 1:
@@ -172,20 +175,19 @@ class App():
 
     def data_export(self):
         tar_dir = tkdialog.askdirectory(initialdir=os.getcwd())
+        error_list = []
 
         for i in range(len(self.img_list)):
             for n in range(len(self.color_dict)):
                 class_name = '_class{0}'.format(n)
 
                 if not self.color_dict.get(class_name) == None:
-                    self.binary_change(self.img_list[i], class_name, self.color_dict[class_name], tar_dir)
-                else:
-                    None
+                    error_file = self.binary_change(self.img_list[i], class_name, self.color_dict[class_name], tar_dir)
+                    
+                    if not error_file == None and not error_file in error_list:
+                        error_list.append(error_file)
 
-        if tar_dir:
-            messagebox.showinfo('情報', '出力完了しました。')
-        else:
-            None
+        messagebox.showinfo('情報', '{0}件 出力完了しました。\n{1}件 未処理画像があります。'.format(i, len(error_list)))
 
 
     def binary_change(self, img_list, class_name, color_thresh, tar_dir):
@@ -217,7 +219,7 @@ class App():
                 n.tofile(f)
         
         else:
-            print("OpenError{0}".format(img_list))
+            return img_list
 
 
     def exit_app(self):
