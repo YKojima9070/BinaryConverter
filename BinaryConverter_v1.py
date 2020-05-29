@@ -17,37 +17,41 @@ class App():
         self.root = root
         self.root.geometry('1680x1050')
         self.root.title(root_title)
+        self.root.configure(bg='#25254f')
 
         label_button1 = tkinter.Button(self.root, text="バイナリデータ作成", command=self.data_export)
         label_button1.place(x=1450, y=10, width=210, height=50)
+
+        frame = tkinter.LabelFrame(root, width=210, height=280, text="SelectLabel")
+        frame.place(x=1450, y=70)
 
         self.v1 = tkinter.IntVar()
         self.v1.set(0)
 
         radio_bt0 = tkinter.Radiobutton(self.root, text='_class0', value=0, variable=self.v1)
-        radio_bt0.place(x=1450, y=100)
+        radio_bt0.place(x=1470, y=100)
         self.box0 = tkinter.Label(self.root, width=5, bg='#FFFFFF')
-        self.box0.place(x=1550, y=100)
+        self.box0.place(x=1570, y=100)
 
         radio_bt1 = tkinter.Radiobutton(self.root, text='_class1', value=1, variable=self.v1)
-        radio_bt1.place(x=1450, y=150)
+        radio_bt1.place(x=1470, y=150)
         self.box1 = tkinter.Label(self.root, width=5, bg='#FFFFFF')
-        self.box1.place(x=1550, y=150)
+        self.box1.place(x=1570, y=150)
 
         radio_bt2 = tkinter.Radiobutton(self.root, text='_class2', value=2, variable=self.v1)
-        radio_bt2.place(x=1450, y=200)
+        radio_bt2.place(x=1470, y=200)
         self.box2 = tkinter.Label(self.root, width=5, bg='#FFFFFF')
-        self.box2.place(x=1550, y=200)
+        self.box2.place(x=1570, y=200)
 
         radio_bt3 = tkinter.Radiobutton(self.root, text='_class3', value=3, variable=self.v1)
-        radio_bt3.place(x=1450, y=250)
+        radio_bt3.place(x=1470, y=250)
         self.box3 = tkinter.Label(self.root, width=5, bg='#FFFFFF')
-        self.box3.place(x=1550, y=250)
+        self.box3.place(x=1570, y=250)
 
         radio_bt4 = tkinter.Radiobutton(self.root, text='_class4', value=4, variable=self.v1)
-        radio_bt4.place(x=1450, y=300)
+        radio_bt4.place(x=1470, y=300)
         self.box4 = tkinter.Label(self.root, width=5, bg='#FFFFFF')
-        self.box4.place(x=1550, y=300)
+        self.box4.place(x=1570, y=300)
 
         exit_button = tkinter.Button(self.root, text='Exit', command=self.exit_app)
         exit_button.place(x=1450, y=800, width=210, height=50)
@@ -129,17 +133,24 @@ class App():
     def img_dir_get(self):
         img_format = [".png", ".jpg", ".jpeg", ".bmp", ".JPG"]
         tar_dir = os.path.dirname(tkdialog.askopenfilename(filetypes=[('all_files', '*.*')], initialdir=os.getcwd()))
-        self.img_list = [p for p in glob.glob("{0}/*".format(tar_dir), recursive=False) if os.path.splitext(p)[1] in img_format]
+        self.img_list = [p for p in glob.glob(r"{0}/*".format(tar_dir), recursive=False) if os.path.splitext(p)[1] in img_format]
 
 
     def img_show(self):
-        img = cv2.imread(self.img_list[self.cur_img_num])
-        self.org_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
-        img = self.scale_box(self.org_img)
-        self.dst_img = Image.fromarray(img, 'RGBA')
-        self.dst_img = ImageTk.PhotoImage(self.dst_img)
-        self.img_canvas.create_image(0, 0, image=self.dst_img, anchor='nw')
-        self.img_canvas.place(x=0, y=0)
+        img = np.fromfile(self.img_list[self.cur_img_num], dtype=np.uint8)
+        img = cv2.imdecode(img, cv2.IMREAD_UNCHANGED)
+
+        if img is not None:
+        
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
+            self.org_img = self.scale_box(img)
+            self.dst_img = Image.fromarray(self.org_img, 'RGBA')
+            self.dst_img = ImageTk.PhotoImage(self.dst_img)
+            self.img_canvas.create_image(0, 0, image=self.dst_img, anchor='nw')
+            self.img_canvas.place(x=0, y=0)
+        
+        else:
+            self.img_list.remove(self.img_list[self.cur_img_num])
 
 
     def scale_box(self, img):
@@ -167,29 +178,34 @@ class App():
 
     def binary_change(self, img_list, class_name, color_thresh, tar_dir):
         img = np.fromfile(img_list, dtype=np.uint8)
-        img = cv2.imdecode(img, cv2.IMREAD_COLOR)
+        img = cv2.imdecode(img, cv2.IMREAD_UNCHANGED)
 
-        b = img[:, :, 0]
-        g = img[:, :, 1]
-        r = img[:, :, 2]
+        if img is not None:
 
-        mask = np.zeros(img.shape, dtype=np.uint8)
+            b = img[:, :, 0]
+            g = img[:, :, 1]
+            r = img[:, :, 2]
 
-        mask[((b < color_thresh[0]+5) & (b > color_thresh[0]-5)) & \
-            ((g < color_thresh[1]+5) & (g > color_thresh[1]-5)) & \
-                ((r < color_thresh[2]+5) & (r > color_thresh[2]-5))] = 255
+            mask = np.zeros(img.shape, dtype=np.uint8)
 
-        mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-        _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
+            mask[((b < color_thresh[0]+5) & (b > color_thresh[0]-5)) & \
+                ((g < color_thresh[1]+5) & (g > color_thresh[1]-5)) & \
+                    ((r < color_thresh[2]+5) & (r > color_thresh[2]-5))] = 255
 
-        ftitle, fpath = os.path.splitext(os.path.basename(img_list))
+            mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+            _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
+
+            ftitle, fpath = os.path.splitext(os.path.basename(img_list))
         
-        save_path = tar_dir + '/' + ftitle + class_name + fpath
+            save_path = tar_dir + '/' + ftitle + class_name + fpath
 
-        _, n = cv2.imencode('.bmp', mask, [int(cv2.IMWRITE_WEBP_QUALITY), 100])
+            _, n = cv2.imencode('.bmp', mask, [int(cv2.IMWRITE_WEBP_QUALITY), 100])
 
-        with open(save_path, mode='w+b') as f:
-            n.tofile(f)
+            with open(save_path, mode='w+b') as f:
+                n.tofile(f)
+        
+        else:
+            print("OpenError{0}".format(img_list))
 
 
     def exit_app(self):
