@@ -82,12 +82,15 @@ class App():
         border5.place(x=1710, y=350)
 
         self.lmode = tkinter.BooleanVar()
-        lmode_button = tkinter.Checkbutton(root, text='ライブビューモード', variable=self.lmode, command=self.img_show, bg='Black')
+        lmode_button = tkinter.Checkbutton(root, text='ライブビューモード', variable=self.lmode, command=self.img_show, bg='gray97', fg='Black')
         lmode_button.place(x=1720, y=380)
 
-        border6 = tkinter.Frame(root, width=185, height=5, borderwidth=30, relief='groove')
-        border6.place(x=1710, y=430)
+        #border6 = tkinter.Frame(root, width=185, height=5, borderwidth=30, relief='groove')
+        #border6.place(x=1710, y=430)
 
+        s_txt = tkinter.Label(root, text='[ 二値化調整代 ]', bg='gray97', fg='Black')
+        s_txt.place(x=1720, y=415)
+      
         self.s_val = tkinter.DoubleVar()
         self.s_val.trace('w', self.s_val_callback)
 
@@ -176,7 +179,7 @@ class App():
     ##ディレクトリ取得##
     def img_dir_get(self):
         img_format = [".png", ".jpg", ".jpeg", ".bmp", ".JPG"]
-        read_file = tkdialog.askopenfilename(filetypes=[('all_files', '*.*')], initialdir=os.getcwd())
+        read_file = os.path.abspath(tkdialog.askopenfilename(filetypes=[('all_files', '*.*')], initialdir=os.getcwd()))
         tar_dir = os.path.dirname(read_file)
         self.img_list = [p for p in glob.glob(r"{0}/*".format(tar_dir), recursive=False) if os.path.splitext(p)[1] in img_format]
         
