@@ -1,3 +1,5 @@
+#!python3.6.6
+
 import cv2
 import os
 import glob
@@ -148,7 +150,7 @@ class App():
                 self.color_dict['_class4'] = self.hextobgr(hex_value)
 
 
-    ##リストボックス管理##
+    ##リストボックスコールバック##
     def listbox_callback(self, event):
         if not len(self.listbox.curselection()) == 0:
             self.cur_img_num = self.listbox.curselection()[0]
@@ -158,7 +160,7 @@ class App():
         else:
             messagebox.showerror('情報', '画像が見つかりません。')
 
-
+    ##スライドバーコールバック##
     def s_val_callback(self, *args):
         self.img_show()
 
@@ -180,6 +182,8 @@ class App():
         
         return read_file
 
+
+    ##画像読み込み##
     def img_read(self):
         img = np.fromfile(self.img_list[self.cur_img_num], dtype=np.uint8)
         self.read_img = cv2.imdecode(img, cv2.IMREAD_UNCHANGED)
