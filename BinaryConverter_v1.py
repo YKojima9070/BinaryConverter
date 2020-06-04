@@ -255,18 +255,26 @@ class App():
         th_val = self.s_val.get()
         if img is not None:
 
-            b = img[:, :, 0]
-            g = img[:, :, 1]
-            r = img[:, :, 2]
+            if not len(img.shape) == 2:
 
-            mask = np.zeros(img.shape, dtype=np.uint8)
+                b = img[:, :, 0]
+                g = img[:, :, 1]
+                r = img[:, :, 2]
 
-            mask[((b < color_thresh[0] + th_val) & (b > color_thresh[0] - th_val)) & \
-                ((g < color_thresh[1] + th_val) & (g > color_thresh[1] - th_val)) & \
-                    ((r < color_thresh[2] + th_val) & (r > color_thresh[2] - th_val))] = 255
+                mask = np.zeros(img.shape, dtype=np.uint8)
 
-            mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-            _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
+                mask[((b < color_thresh[0] + th_val) & (b > color_thresh[0] - th_val)) & \
+                    ((g < color_thresh[1] + th_val) & (g > color_thresh[1] - th_val)) & \
+                        ((r < color_thresh[2] + th_val) & (r > color_thresh[2] - th_val))] = 255
+
+                mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+                _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
+
+            else:
+
+                th_v = color_thresh[0] + th_val
+                _, mask = cv2.threshold(img, th_v, 255, cv2.THRESH_BINARY)
+
 
             return None, mask
 
